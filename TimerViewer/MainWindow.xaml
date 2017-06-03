@@ -1,0 +1,46 @@
+﻿<Window x:Class="TimerViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TimerViewer"
+        mc:Ignorable="d"
+        Title="Timer Viewer" Height="500" Width="1024"
+                  >
+    <DockPanel LastChildFill="True">
+        <Menu DockPanel.Dock="Top" IsMainMenu="True">
+            <MenuItem Header="_File">
+                <MenuItem x:Name="FileOpen" Header="_Open..." Click="FileOpen_Click"></MenuItem>
+                <Separator  />
+                <MenuItem x:Name="ExitApp" Header="_Exit" Click="ExitApp_Click"></MenuItem>
+            </MenuItem>
+        </Menu>
+        <DataGrid Margin="0,0,0,5" Name="Times" 
+                  IsReadOnly="True"
+                  CanUserReorderColumns="True" CanUserResizeColumns="True" 
+          CanUserResizeRows="False" CanUserSortColumns="True"
+                    RowBackground="LightYellow"
+                    AlternatingRowBackground="LightBlue"
+                    AutoGenerateColumns="False"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  >
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <EventSetter Event="MouseUp" Handler="Row_Click" />
+                    <Setter Property="FontSize" Value="14"
+                            />
+                </Style>
+            </DataGrid.Resources>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Who" Binding="{Binding emp}" />
+                <DataGridTextColumn Header="When" Binding="{Binding when, StringFormat=d, ConverterCulture=en-AU}" />
+                <DataGridTextColumn Header="Job" Binding="{Binding job}" />
+                <DataGridTextColumn Header="Item" Binding="{Binding item}" />
+                <DataGridTextColumn Header="Hours" Binding="{Binding duration}" />
+                <DataGridCheckBoxColumn Header="Billable" Binding="{Binding billable}" Visibility="{Binding BillingVisible}" />
+                <DataGridTextColumn Header="Notes" Binding="{Binding notes}" Width="*"  />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</Window>
