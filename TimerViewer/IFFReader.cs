@@ -24,7 +24,7 @@ namespace TimerViewer {
 
         const string TIMER_HEADER = "TIMEACT";
 
-        public static IEnumerable<TimerRec> ImportFile(string fileName) {
+        public static IEnumerable<TimerRec> ImportFile(string fileName, bool condensed = true) {
             var reader = new StreamReader(fileName);
             var input = reader.ReadToEnd();
 
@@ -37,17 +37,17 @@ namespace TimerViewer {
             foreach ( var txn in transactionTypes ) {
                 var transactionType = txn.Replace("\r", "").Replace("\n", "").Trim();
 
-                if( transactionType.StartsWith(TIMER_HEADER)) { 
+                if ( transactionType.StartsWith(TIMER_HEADER) ) {
                     var entries = txn.Split(new[] { TIMER_HEADER }, StringSplitOptions.RemoveEmptyEntries).Where(x => x.Length > 1);
 
-                    foreach(var rec in entries) {
+                    foreach ( var rec in entries ) {
                         var cols = rec.Split('\t').ToList();
 
                         cols.RemoveAt(0); // get rid of first empty element
 
                         var when = DateTime.Parse(cols[0], us_culture); // parse US-style dates
 
-                        res.Add( new TimerRec {
+                        res.Add(new TimerRec {
                             when = when,
                             job = cols[1],
                             emp = cols[2],
@@ -62,7 +62,59 @@ namespace TimerViewer {
                 }
             }
 
+            if ( condensed ) {
+                // map of <job,who,when> => TimerRec
+                var map = new Dictionary<Tuple<string, string, DateTime>, TimerRec>();
+
+                foreach ( var item in res ) {
+                    if ( item.billable ) {
+                        var key = Tuple.Create<string, string, DateTime>(item.job, item.emp, item.when);
+
+                        if ( map.ContainsKey(key) ) {
+                            var update = map[key];
+
+                            if(!update.notes.Contains(Environment.NewLine)) {
+                                update.notes += " (" + update.duration + ")";
+                            }
+
+                            update.notes += Environment.NewLine + "+ " + item.notes+" ("+item.duration+")";
+
+                            update.duration = AddDuration(item.duration, update.duration);
+                        } else {
+                            map.Add(key, item);
+                        }
+                    }
+                }
+
+                var r = map.Values.OrderBy(x => x.when).ThenBy(y => y.job).ToList();
+
+                res = r;
+            }
+
             return res;
+        }
+
+
+        private static Regex duration = new Regex(@"^(\d+):(\d\d)$");
+
+        private static string AddDuration(string duration1, string duration2) {
+            var total = ParseMinutes(duration1) + ParseMinutes(duration2);
+
+            var hours = total / 60;
+            var mins = total - hours * 60;
+
+            return string.Format(@"{0:00}:{1:00}", hours, mins);
+        }
+
+        private static int ParseMinutes(string tstr) {
+            var match = duration.Match(tstr);
+
+            if(!match.Success) {
+                throw new Exception("Invalid duration " + tstr);
+            }
+
+            return int.Parse(match.Groups[1].Value) * 60 + int.Parse(match.Groups[2].Value);
+
         }
     }
 }

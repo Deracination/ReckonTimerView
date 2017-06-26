@@ -46,7 +46,7 @@ namespace TimerViewer {
             Application.Current.Shutdown();
         }
 
-        bool billing = true;
+        bool billing = false;
         private bool ShowBilling {
             get { return billing; }
             set {
@@ -56,11 +56,23 @@ namespace TimerViewer {
             }
         }
 
-        private void Row_Click(object sender, MouseButtonEventArgs e) {
-            var row = sender as DataGridRow;
-            var rec = row.DataContext as IFFReader.TimerRec;
+        //private void Row_Click(object sender, MouseButtonEventArgs e) {
+        //    var row = sender as DataGridRow;
+        //    var rec = row.DataContext as IFFReader.TimerRec;
 
-            Clipboard.SetText(rec.notes+Environment.NewLine);
+        //    Clipboard.SetText(rec.notes+Environment.NewLine);
+        //}
+
+        private void Times_SelectedCellsChanged(object sender, SelectedCellsChangedEventArgs e) {
+            var cell = e.AddedCells[0]; // selection unit is cell, so only ever one cell
+            var col = (string)cell.Column.Header;
+            var item = (IFFReader.TimerRec) cell.Item;
+
+            string value = col == @"Hours"
+                    ? item.duration
+                    : item.notes;
+
+            Clipboard.SetText(value);
         }
     }
 }

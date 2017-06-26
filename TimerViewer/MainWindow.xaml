@@ -18,16 +18,18 @@
         <DataGrid Margin="0,0,0,5" Name="Times" 
                   IsReadOnly="True"
                   CanUserReorderColumns="True" CanUserResizeColumns="True" 
-          CanUserResizeRows="False" CanUserSortColumns="True"
+                    CanUserResizeRows="False" CanUserSortColumns="True"
                     RowBackground="LightYellow"
                     AlternatingRowBackground="LightBlue"
                     AutoGenerateColumns="False"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
+                  SelectionUnit="Cell"
+                  SelectedCellsChanged="Times_SelectedCellsChanged"
                   >
             <DataGrid.Resources>
                 <Style TargetType="DataGridRow">
-                    <EventSetter Event="MouseUp" Handler="Row_Click" />
+                    <!--<EventSetter Event="MouseUp" Handler="Row_Click" />-->
                     <Setter Property="FontSize" Value="14"
                             />
                 </Style>
@@ -38,7 +40,7 @@
                 <DataGridTextColumn Header="Job" Binding="{Binding job}" />
                 <DataGridTextColumn Header="Item" Binding="{Binding item}" />
                 <DataGridTextColumn Header="Hours" Binding="{Binding duration}" />
-                <DataGridCheckBoxColumn Header="Billable" Binding="{Binding billable}" Visibility="{Binding BillingVisible}" />
+                <DataGridCheckBoxColumn Header="Billable" Binding="{Binding billable}" Visibility="Hidden" />
                 <DataGridTextColumn Header="Notes" Binding="{Binding notes}" Width="*"  />
             </DataGrid.Columns>
         </DataGrid>
